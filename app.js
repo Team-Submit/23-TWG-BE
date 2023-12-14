@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const dot = require("dotenv");
 const sequelize = require("./models").sequelize;
+const router = require("./router");
 
 const port = process.env.PORT || 8000;
 
@@ -23,6 +24,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cors(corsOptions));
 
 app.set("jwt-secret", process.env.JWT);
+
+app.use("/", router);
 
 app.listen(port, () => {
   sequelize
