@@ -1,19 +1,25 @@
 const jwt = require("jsonwebtoken");
 
-const tokenVerify = async (req, res) => {
-  const accessToken = req.headers.authorization || req.query.token;
-  const secretKey = process.env.secretKey;
-
-  if (!accessToken) {
-    return res.status(401).json({
-      message: "로그인이 필요합니다.",
-    });
-  }
+const tokenVerify = async (req, res, next) => {
+  console.log(req.headers);
+  const accessToken = req.headers.authorization;
+  const secretKey = process.env.ACCESS_SECRET;
 
   try {
-    return jwt.verify(accessToken.split("Bearer ")[1], secretKey);
+    if (!accessToken) {
+      req.decoded = { id: null };
+      next();
+    } else {
+      return jwt.verify(
+        accessToken.split("Bearer ")[1],
+        secretKey,
+        async (err, decoded) => {
+          req.decoded = decoded;
+          next();
+        }
+      );
+    }
   } catch (err) {
-    console.error(err);
     return res.status(400).json({
       message: "에러가 발생했습니다.",
     });
